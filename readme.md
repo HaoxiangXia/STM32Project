@@ -72,6 +72,17 @@ while (1)
 }
 ```
 
+# exit
+
+抢占优先级Preemption > 响应优先级Sub
+
+Time base: System tick timer 要优先于 EXTI
+
+GPIO mode: 
+- External Interrupt Mode with Rising...            上升沿触发中断
+- External Interrupt Mode with Falling...           下降沿触发中断
+- External Interrupt Mode with Rising/Falling...    上升/下降都沿触发中断
+
 ---
 ---
 
