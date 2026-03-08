@@ -5,13 +5,15 @@ cubemx：
 GPIO output level 设置初始电平
 
 GPIO mode: 
-- output push pull 推挽输出
-- output open drain 开漏输出
+- output push pull 推挽输出——可主动输出高电平和低电平  
+- output open drain 开漏输出——只能主动输出低电平，高电平需要外部上拉
 
->PC13采用开漏
+>PC13（板载LED）通常配置为开漏输出，因为其外部接有上拉电阻
 
-Maximum output speed：
-- low：led
+Maximum output speed（控制GPIO输出驱动能力）：
+- Low：适合LED等低速信号
+- Medium / High：适合SPI、PWM等高速信号
+
 
 ```c
 HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_SET/*GPIO_PIN_RESET*/); //GPIO分组，pin, 状态
@@ -38,6 +40,8 @@ HAL_GetTick(); //返回系统启动以来经过的毫秒数
 ```
 
 ### 非阻塞按键消抖
+原理：检测到按键按下后等待10ms（机械按键抖动时间一般为 5~20ms），再次确认按键状态。
+如果仍然按下，则认为按键有效。
 ```c
 uint8_t key_processed = 0;
 uint32_t debounce_time = 0;
@@ -72,7 +76,7 @@ while (1)
 }
 ```
 
-# exit
+# EXTI (External Interrupt) 外部中断
 
 抢占优先级Preemption > 响应优先级Sub
 
@@ -93,7 +97,24 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) //中断回调函数
 }
 ```
 
+# UART 串口
+
+### USART
+
+Mode: Asyn...异步模式
+
+Baud Rate: 波特率（一般设为115200）
+
+```c
+HAL_UART_Transmit(&huart2, message, strlen(message), HAL_MAX_DELAY);  //串口阻塞发送函数
+HAL_UART_Transmit_IT(&huart2, message, strlen(message));  //串口中断发送函数
+
+
+```
+
 # 定时器 Timers
+
+## Base Timer
 
 ### TIM
 - 高级定时器：TIM1, TIM8
@@ -116,7 +137,9 @@ m-1：定时m个脉冲（从0数到m-1）
 eg:
 72MHz下
 预分频器7200-1
+72MHz / 7200 = 10000Hz
 自动重装载寄存器10000-1
+10000 / 10000 = 1Hz
 定时1秒（^_^）
 ```
 ---
@@ -125,7 +148,7 @@ HAL_TIM_Base_Start(&htim3);    //基本定时器启动函数
 __HAL_TIM_GET_COUNTER(&htim3); //获取计数器值
 /*双下划线开头全大写函数都是偏底层的*/
 HAL_TIM_Base_Start_IT(&htim3); //基本定时器中断启动函数
-void HAL_TIM_PeriodElapsedCallback(***Def *htim) //定时器中断回调函数
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) //定时器中断回调函数
 {
     if (htim == &htim3){
 
@@ -134,15 +157,32 @@ void HAL_TIM_PeriodElapsedCallback(***Def *htim) //定时器中断回调函数
 ```
 
 
-# PWM_light
+## PWM_light
+
+定时器设置为输出比较模式中的PWM模式，输出脉冲
+
 ```c
 HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);        //PWM启动函数
-__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, i); //
+__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, i); //设置比较寄存器
 ```
 
----
----
+## Encoder 编码器
+
+### TIM设置Combined Channels：
+Encoder mode
+
+默认使用 TI1 + TI2 双边沿检测，一次完整编码器脉冲可能计数 ±2 ,可以设置预分频器Prescaler为1,二分频后变化值为1
+
+改变上升沿和下降沿可以变换方向
+
+```c
+HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_ALL); //编码器启动函数
+
+__HAL_TIM_SET_COUNTER(&htim1, 100); //设置计数器
+```
+
+# 遇到的问题
 
 >WARN: ST-Link is not in the DFU mode. Please restart it and retry.
 
-fix: 重新插ST-Link
+how to fix: 重新插ST-Link
