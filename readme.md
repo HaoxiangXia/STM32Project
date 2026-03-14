@@ -143,6 +143,8 @@ eg:
 定时1秒（^_^）
 ```
 ---
+
+#### Start启动函数写在/* USER CODE BEGIN 2 */（系统启动函数后）
 ```c
 HAL_TIM_Base_Start(&htim3);    //基本定时器启动函数
 __HAL_TIM_GET_COUNTER(&htim3); //获取计数器值
@@ -168,12 +170,13 @@ __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, i); //设置比较寄存器
 
 ## Encoder 编码器
 
-### TIM设置Combined Channels：
-Encoder mode
+### TIM 设置 Combined Channels：
+- Encoder mode
 
-默认使用 TI1 + TI2 双边沿检测，一次完整编码器脉冲可能计数 ±2 ,可以设置预分频器Prescaler为1,二分频后变化值为1
+### Settings 设置 Encoder mode
+- 默认使用 TI1 + TI2 双边沿检测，一次完整编码器脉冲可能计数 ±2 ,可以设置预分频器Prescaler为1,二分频后变化值为1
 
-改变上升沿和下降沿可以变换方向
+### 改变上升沿和下降沿可以变换方向
 
 ```c
 HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_ALL); //编码器启动函数
