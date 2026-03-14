@@ -113,15 +113,17 @@ int main(void)
   {
     // 验证：电机能转
     // 测试代码：
-    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, 1);
-    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, 0);
+    // 左电机方向（反转）
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, 0);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, 1);
 
-    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, 1);
-    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_11, 0);
+    // 右电机方向（反转）
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, 0);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_11, 1);
 
     // 设置占空比：
-    __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 500);
-    __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 500);
+    __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 100);
+    __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 100);
 
     /* USER CODE END WHILE */
 
